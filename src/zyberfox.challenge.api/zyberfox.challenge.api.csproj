@@ -5,10 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\User.Core\User.Core.csproj" />
+    <ProjectReference Include="..\..\User.Infrastructure\User.Infrastructure.csproj" />
+    <ProjectReference Include="..\User.Application\User.Application.csproj" />
     <ProjectReference Include="..\zyberfox.challenge.data\zyberfox.challenge.data.csproj" />
   </ItemGroup>
 

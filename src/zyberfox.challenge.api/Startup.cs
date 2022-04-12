@@ -7,6 +7,15 @@ using Microsoft.OpenApi.Models;
 using zyberfox.challenge.data.Cache;
 using zyberfox.challenge.data.Entities;
 using System;
+using User.Core.Repositories.Base;
+using User.Infrastructure.Repositories.Base;
+using User.Application.Handlers;
+using System.Reflection;
+using MediatR;
+using User.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using User.Infrastructure.Repositories;
+using AutoMapper;
 
 namespace zyberfox.challenge.api
 {
@@ -25,12 +34,20 @@ namespace zyberfox.challenge.api
             services.AddControllers();
             services.AddMvc();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            services.AddDbContext<UserContext>(m => m.UseSqlServer(Configuration.GetConnectionString("userdb")), ServiceLifetime.Singleton);
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "User.API",
+                    Version = "v1"
+                });
             });
 
-            services.AddSingleton<ISimpleObjectCache<Guid, User>, SimpleObjectCache<Guid, User>>();        
+            services.AddAutoMapper(typeof(Startup));
+            services.AddMediatR(typeof(CreateUserHandler).GetTypeInfo().Assembly);
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddTransient<User.Core.Repositories.IUserRepository, UserRepository>();
+            services.AddSingleton<ISimpleObjectCache<Guid, User.Core.Entities.User>, SimpleObjectCache<Guid, User.Core.Entities.User>>();        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

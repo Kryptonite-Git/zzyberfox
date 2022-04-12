@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using User.Application.Commands;
+using User.Application.Responses;
 
 namespace zyberfox.challenge.api.Controllers
 {
@@ -7,10 +14,26 @@ namespace zyberfox.challenge.api.Controllers
     [Produces("application/json")]
     public class UserController : Controller
     {
-        [HttpPost]
-        public IActionResult CreateUser()
+
+        private readonly IMediator _mediator;
+        public UserController(IMediator mediator)
         {
-            return Ok();
+            _mediator = mediator;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<List<User.Core.Entities.User>> Get()
+        {
+            return await _mediator.Send(new GetAll());
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserResponse>> CreateUser([FromBody] CreateUserCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
 
         [HttpGet]
